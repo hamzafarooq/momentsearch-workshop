@@ -11,7 +11,7 @@
 
 Ask a question about a video and get back the exact moments that answer it: what was **said**, and what was **on screen**. A transcript alone misses half of a video. This workshop indexes both halves, merges them into moments, refuses when the evidence is thin, and measures itself with an answer key.
 
-![A moment is what was said plus what was shown](docs/img/slide-moment.jpg)
+![We search moments, not transcript chunks](docs/img/slide-moment.jpg)
 
 ## Two notebooks
 
@@ -45,7 +45,9 @@ flowchart LR
 
 ### Adding a video
 
-![Adding a video happens once, and takes about 30 seconds](docs/img/slide-add-a-video.jpg)
+![Adding a video, part 1: the pictures](docs/img/slide-add-pics.jpg)
+
+![Adding a video, part 2: the words](docs/img/slide-add-words.jpg)
 
 | Step | What happens | How LLMs work (4:21) |
 |---|---|---|
@@ -56,49 +58,49 @@ flowchart LR
 | Chunk | ~20 s per chunk: long enough to mean something, short enough to point at | **13** chunks |
 | Two vectors per chunk | `text-embedding-3-small` (meaning) + BM25 sparse (exact words), one Qdrant point | 13 points |
 
-![A four-minute video has 15,700 frames. The index keeps 71](docs/img/slide-funnel.jpg)
+![15,700 frames in, 71 kept](docs/img/slide-funnel.jpg)
 
 Dropping repeats is the biggest saving and the first thing that can go wrong. The 1:40 slide (a stack of pages under a magnifying glass) is dropped as a repeat of 1:26. It costs an answer. The key asks for that slide, and check 1 refuses it in every mode: the best picture match is 0.22 (bar 0.24) and the best transcript match 0.328 (bar 0.33).
 
-![Our first optimization quietly deleted the picture of a real answer](docs/img/slide-dedup.jpg)
+![We dropped a frame we needed](docs/img/slide-dedup.jpg)
 
-![Every 20 seconds of speech gets two vectors](docs/img/slide-two-vectors.jpg)
+![Each piece of speech gets two vectors](docs/img/slide-two-vectors.jpg)
 
 ### Asking a question
 
-![Asking happens every time, and takes a few seconds](docs/img/slide-ask.jpg)
+![Asking: every time, a few seconds](docs/img/slide-ask.jpg)
 
-![One question, three searches](docs/img/slide-three-searches.jpg)
+![Three searches at once](docs/img/slide-three-searches.jpg)
 
 Cosine and BM25 scores live on different scales, so the lists are merged by rank (reciprocal rank fusion, `1 / (60 + rank)`), then hits within 15 seconds in the same video become one moment:
 
-![Merge by rank](docs/img/slide-rrf.jpg)
+![Merge by rank, not by score](docs/img/slide-rrf.jpg)
 
-![When the picture and the speech agree, the moment counts 1.5 times](docs/img/slide-boost.jpg)
+![When both agree, it counts 1.5 times](docs/img/slide-boost.jpg)
 
 On short videos the boost lands on almost everything: each search returns 20 hits and a 4-minute video has 13 transcript chunks, so every frame hit finds a chunk within 15 seconds. A frames-only moment never reached the top 6 in our runs.
 
 Two checks keep it from making things up. **Check 1** runs before the model: if the best picture match is under **0.24** and the best transcript match under **0.33**, it answers "I couldn't find that" without an LLM call. **Check 3** runs after: code deletes any `[n]` that points at a moment the model was never shown.
 
-![If nothing is close enough, the model never runs](docs/img/slide-gate.jpg)
+![Nothing close enough? It stops](docs/img/slide-gate.jpg)
 
-![Code deletes citations that point at nothing](docs/img/slide-citations.jpg)
+![Fake citations get deleted](docs/img/slide-citations.jpg)
 
 ### At scale
 
-![Keep slow ingestion out of the question path](docs/img/slide-split-paths.jpg)
+![Keep uploads away from questions](docs/img/slide-split-paths.jpg)
 
 In production each ingestion step is a Prefect task with its own retry rule (fetch 2 retries at 30 s and 2 min, embed 2 at 60 s, transcript 1), so a failure reruns one step, not the whole video. The quickstart's `ms.add_video()` runs the same steps in order without Prefect; the from-scratch notebook runs the real flow.
 
-![The queue retries the step that failed](docs/img/slide-retries.jpg)
+![Retry the step, not the video](docs/img/slide-retries.jpg)
 
 Memory is the bill at scale. Each collection keeps full float32 vectors on disk and an int8 copy in RAM that does the searching, then rescores the top hits with the full vectors:
 
-![A copy at a quarter of the memory finds the same top ten](docs/img/slide-int8.jpg)
+![A quarter of the memory, the same top ten](docs/img/slide-int8.jpg)
 
 ## Measured: the answer key
 
-![Scoring it takes seconds, so you run it after every change](docs/img/slide-measure.jpg)
+![Scoring: seconds, after every change](docs/img/slide-measure.jpg)
 
 21 questions over the three videos with known answer windows: 9 **said**, 5 **shown**, 3 **both**, 4 **not in the videos** (must refuse). A hit is a returned moment within 15 s of the window. No LLM call, so the whole key runs in seconds.
 
@@ -108,7 +110,7 @@ Memory is the bill at scale. Each collection keeps full float32 vectors on disk 
 | pictures only | 47% | 67% | 0% | 67% | 0.28 | 100% |
 | both (default) | 82% | 100% | 40% | 100% | 0.82 | 75% |
 
-![Three numbers, and none of them needs the model](docs/img/slide-three-numbers.jpg)
+![Three numbers, no model](docs/img/slide-three-numbers.jpg)
 
 Read this honestly: on these three videos the transcript alone wins, because the speaker describes what is on screen, and with short videos nearly every moment is found by both a frame and the text, so the ×1.5 boost stops separating them. Benchmarks on chart-heavy video (CFVBench, above) show the opposite. Run the key on your own videos before you pick.
 
