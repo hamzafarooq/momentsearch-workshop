@@ -1,0 +1,38 @@
+{
+ "demo_how-llms-work": {
+  "id": "demo_how-llms-work",
+  "title": "How LLMs work",
+  "source": "demo",
+  "url": null,
+  "content_id": "demo_how-llms-work",
+  "status": "indexed",
+  "duration": 261.683333,
+  "sampled": 131,
+  "frame_count": 71,
+  "chunks": 13
+ },
+ "demo_llm-to-agent": {
+  "id": "demo_llm-to-agent",
+  "title": "What turns an LLM into an agent",
+  "source": "demo",
+  "url": null,
+  "content_id": "demo_llm-to-agent",
+  "status": "indexed",
+  "duration": 261.516667,
+  "sampled": 131,
+  "frame_count": 61,
+  "chunks": 13
+ },
+ "demo_harness": {
+  "id": "demo_harness",
+  "title": "The harness and Claude Code",
+  "source": "demo",
+  "url": null,
+  "content_id": "demo_harness",
+  "status": "indexed",
+  "duration": 255.033333,
+  "sampled": 128,
+  "frame_count": 58,
+  "chunks": 12
+ }
+}
