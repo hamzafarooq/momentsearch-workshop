@@ -58,7 +58,7 @@ flowchart LR
 
 ![A four-minute video has 15,700 frames. The index keeps 71](docs/img/slide-funnel.jpg)
 
-Dropping repeats is the biggest saving and the first thing that can go wrong. The 1:40 slide (a stack of pages under a magnifying glass) is dropped as a repeat of 1:26. The answer survives anyway: asked for that slide, the combined search finds the moment at rank 1 through the speech and the 1:20 frame; pictures alone are refused at check 1.
+Dropping repeats is the biggest saving and the first thing that can go wrong. The 1:40 slide (a stack of pages under a magnifying glass) is dropped as a repeat of 1:26. It costs an answer. The key asks for that slide, and check 1 refuses it in every mode: the best picture match is 0.22 (bar 0.24) and the best transcript match 0.328 (bar 0.33).
 
 ![Our first optimization quietly deleted the picture of a real answer](docs/img/slide-dedup.jpg)
 
@@ -100,19 +100,19 @@ Memory is the bill at scale. Each collection keeps full float32 vectors on disk 
 
 ![Scoring it takes seconds, so you run it after every change](docs/img/slide-measure.jpg)
 
-20 questions over the three videos with known answer windows: 9 **said**, 4 **shown**, 3 **both**, 4 **not in the videos** (must refuse). A hit is a returned moment within 15 s of the window. No LLM call, so the whole key runs in seconds.
+21 questions over the three videos with known answer windows: 9 **said**, 5 **shown**, 3 **both**, 4 **not in the videos** (must refuse). A hit is a returned moment within 15 s of the window. No LLM call, so the whole key runs in seconds.
 
 | Search | found@6 | said | shown | both | MRR | refusal accuracy |
 |---|---|---|---|---|---|---|
-| transcript only | **94%** | 100% | 75% | 100% | 0.91 | 75% |
-| pictures only | 50% | 67% | 0% | 67% | 0.30 | 100% |
-| both (default) | 88% | 100% | 50% | 100% | 0.88 | 75% |
+| transcript only | **88%** | 100% | 60% | 100% | 0.85 | 75% |
+| pictures only | 47% | 67% | 0% | 67% | 0.28 | 100% |
+| both (default) | 82% | 100% | 40% | 100% | 0.82 | 75% |
 
 ![Three numbers, and none of them needs the model](docs/img/slide-three-numbers.jpg)
 
 Read this honestly: on these three videos the transcript alone wins, because the speaker describes what is on screen, and with short videos nearly every moment is found by both a frame and the text, so the ×1.5 boost stops separating them. Benchmarks on chart-heavy video (CFVBench, above) show the opposite. Run the key on your own videos before you pick.
 
-The gates (0.24 / 0.33) were chosen by sweeping this same key, which flatters these numbers. Test new questions before you trust them.
+The gates (0.24 / 0.33) were chosen by sweeping the first 20 questions, which flatters those numbers. The 21st (the 1:40 slide that dedup dropped) was added after the sweep, and it fails: refused at check 1 by 0.002. Test new questions before you trust them.
 
 ## The app
 
@@ -146,7 +146,7 @@ ms.app()
 | `ms/ingest.py` | `add_video()`: fetch, sample, dedup, CLIP, transcript, chunks, upsert |
 | `ms/search.py` | three searches, RRF, moments, rerank, check 1, `retrieve()` |
 | `ms/answer.py` | the prompt, citation cleanup, multi-part questions, `ask_engine()` |
-| `ms/evals.py` | the 20-question key, `report()`, `which_branch()` |
+| `ms/evals.py` | the 21-question key, `report()`, `which_branch()` |
 | `ms/app.py` | the Gradio app |
 | `ms/show.py` | notebook display: `ask()`, `look_inside()`, `library()` |
 

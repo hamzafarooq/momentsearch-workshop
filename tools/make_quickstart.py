@@ -56,7 +56,7 @@ ms.ask(q, use_frames=False)   # transcript only"""),
 
 M("""## 3. Measure it
 
-One good answer proves little. The repo has an **answer key**: 20 questions about the three videos where we already know the answer and where it is.
+One good answer proves little. The repo has an **answer key**: 21 questions about the three videos where we already know the answer and where it is.
 
 * **said**: the answer is in the speech; **shown**: on screen; **both**: needs the two; **not in the videos**: the right move is to refuse.
 * **found@6**: share of answerable questions with the right moment in the top 6.

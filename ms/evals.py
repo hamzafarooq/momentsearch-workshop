@@ -24,6 +24,7 @@ KEY = [
     Q("What should you type in Claude Code between tasks to start fresh?", "said", H, (114.8, 121.1)),
     Q("Which other harnesses besides Claude Code are named?", "said", H, (214.7, 222.5)),
     Q("Show me the receipt with lines for tokens in and tokens out.", "shown", L, (166.2, 183.7)),
+    Q("Show me the slide with the stack of pages and the magnifying glass.", "shown", L, (100.0, 102.0)),
     Q("Find the screen where the chat is searching the web and shows event cards.", "shown", A, (11.5, 21.2)),
     Q("Show me the permission prompt that asks before deleting the build folder.", "shown", H, (121.1, 138.6)),
     Q("Where is the tip splitter app with fields for the bill, tip and people?", "shown", H, (228.0, 243.0)),
