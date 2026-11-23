@@ -1,0 +1,5 @@
+qdrant-client==1.17.1
+fastembed==0.9.1
+openai>=1.40
+sentence-transformers
+yt-dlp
