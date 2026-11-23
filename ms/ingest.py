@@ -277,7 +277,8 @@ def add_video(source, title=None, transcript=None):
 
         VIDEOS[vid] = {"id": vid, "title": title, "source": kind, "url": url, "content_id": content_id,
                        "status": "indexed", "duration": info["duration"], "sampled": len(sampled),
-                       "frame_count": n_frames, "chunks": n_chunks}
+                       "frame_count": n_frames, "chunks": n_chunks,
+                       "path": str(path) if kind == "upload" else None}
         save_library()
         print(f"done in {time.time() - t0:.0f} s. video id: {vid}")
         return vid

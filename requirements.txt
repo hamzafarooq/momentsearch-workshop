@@ -3,3 +3,5 @@ fastembed==0.9.1
 openai>=1.40
 sentence-transformers
 yt-dlp
+gradio
+ipykernel

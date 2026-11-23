@@ -16,6 +16,24 @@ There are two notebooks:
 3. Click the key icon on the left, add `OPENAI_API_KEY`, and switch on notebook access. That's the only key you need.
 4. Run the first cell. It clones this repo into `/content/momentsearch-workshop`.
 
+## Run it on your own machine (optional)
+
+Colab needs nothing installed, so use it in class. To run it on your laptop instead:
+
+1. **Python 3.10 to 3.12** and **ffmpeg** (macOS: `brew install ffmpeg`; Ubuntu: `sudo apt install ffmpeg`; Windows: `winget install ffmpeg`).
+2. Get the code and install (about 3 GB, mostly PyTorch and the CLIP model on first run):
+   ```
+   git clone https://github.com/hamzafarooq/momentsearch-workshop
+   cd momentsearch-workshop
+   python -m venv .venv
+   source .venv/bin/activate        # Windows: .venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+3. Put your key in a file named `.env` in this folder: `OPENAI_API_KEY=sk-...` (git ignores it).
+4. Run the app with `python app.py` and open the address it prints, or open `quickstart.ipynb` in VS Code or Jupyter and run the cells.
+
+Without a GPU, asking is fast; adding a video of a few minutes takes a minute or two.
+
 ## Quickstart
 
 | Part | What happens |

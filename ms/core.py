@@ -30,14 +30,21 @@ _clip_lock, _bm25_lock = threading.Lock(), threading.Lock()
 
 
 def secret(name):
-    """A Colab secret, else an environment variable, else ""."""
+    """A Colab secret, else an environment variable, else a line in .env at the repo root."""
     value = ""
     try:
         from google.colab import userdata
         value = userdata.get(name) or ""
     except Exception:
         pass
-    return (value or os.environ.get(name, "")).strip()
+    value = value or os.environ.get(name, "")
+    env = REPO / ".env"
+    if not value and env.exists():
+        for line in env.read_text().splitlines():
+            k, _, v = line.partition("=")
+            if k.strip() == name:
+                value = v.strip().strip('"').strip("'")
+    return value.strip()
 
 
 def setup(fresh=False):
@@ -46,7 +53,8 @@ def setup(fresh=False):
     from openai import OpenAI
 
     key = secret("OPENAI_API_KEY")
-    assert key, "Add OPENAI_API_KEY in Colab secrets (key icon, left sidebar) and switch on Notebook access."
+    assert key, ("Add OPENAI_API_KEY in Colab secrets (key icon, left sidebar) and switch on Notebook access. "
+                 "On your own machine, put OPENAI_API_KEY=... in a .env file at the repo root.")
 
     if fresh and S.qdrant is not None:
         S.qdrant.close()
