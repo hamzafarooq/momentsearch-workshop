@@ -34,7 +34,7 @@ flowchart LR
   V --> T["transcript<br/>or Whisper"] --> K["20 s chunks"] --> E["OpenAI 1536-d<br/>+ BM25"] --> QT[("Qdrant<br/>transcript")]
 ```
 
-**2 · Ask** (every question; ~3 s)
+**2 · Ask** (every question; a few seconds)
 
 ```mermaid
 flowchart LR
@@ -45,7 +45,7 @@ flowchart LR
 
 ### Adding a video
 
-![One video in, two lanes out](docs/img/slide-pipeline.jpg)
+![Adding a video happens once, and takes about 30 seconds](docs/img/slide-add-a-video.jpg)
 
 | Step | What happens | How LLMs work (4:21) |
 |---|---|---|
@@ -56,13 +56,17 @@ flowchart LR
 | Chunk | ~20 s per chunk: long enough to mean something, short enough to point at | **13** chunks |
 | Two vectors per chunk | `text-embedding-3-small` (meaning) + BM25 sparse (exact words), one Qdrant point | 13 points |
 
-Dropping repeats is the biggest saving and the first thing that can go wrong:
+![A four-minute video has 15,700 frames. The index keeps 71](docs/img/slide-funnel.jpg)
 
-![Our first optimization quietly deleted a real answer](docs/img/slide-dedup.jpg)
+Dropping repeats is the biggest saving and the first thing that can go wrong. The 1:40 slide (a stack of pages under a magnifying glass) is dropped as a repeat of 1:26. The answer survives anyway: asked for that slide, the combined search finds the moment at rank 1 through the speech and the 1:20 frame; pictures alone are refused at check 1.
+
+![Our first optimization quietly deleted the picture of a real answer](docs/img/slide-dedup.jpg)
 
 ![Every 20 seconds of speech gets two vectors](docs/img/slide-two-vectors.jpg)
 
 ### Asking a question
+
+![Asking happens every time, and takes a few seconds](docs/img/slide-ask.jpg)
 
 ![One question, three searches](docs/img/slide-three-searches.jpg)
 
@@ -72,7 +76,11 @@ Cosine and BM25 scores live on different scales, so the lists are merged by rank
 
 ![When the picture and the speech agree, the moment counts 1.5 times](docs/img/slide-boost.jpg)
 
+On short videos the boost lands on almost everything: each search returns 20 hits and a 4-minute video has 13 transcript chunks, so every frame hit finds a chunk within 15 seconds. A frames-only moment never reached the top 6 in our runs.
+
 Two checks keep it from making things up. **Check 1** runs before the model: if the best picture match is under **0.24** and the best transcript match under **0.33**, it answers "I couldn't find that" without an LLM call. **Check 3** runs after: code deletes any `[n]` that points at a moment the model was never shown.
+
+![If nothing is close enough, the model never runs](docs/img/slide-gate.jpg)
 
 ![Code deletes citations that point at nothing](docs/img/slide-citations.jpg)
 
@@ -84,7 +92,13 @@ In production each ingestion step is a Prefect task with its own retry rule (fet
 
 ![The queue retries the step that failed](docs/img/slide-retries.jpg)
 
+Memory is the bill at scale. Each collection keeps full float32 vectors on disk and an int8 copy in RAM that does the searching, then rescores the top hits with the full vectors:
+
+![A copy at a quarter of the memory finds the same top ten](docs/img/slide-int8.jpg)
+
 ## Measured: the answer key
+
+![Scoring it takes seconds, so you run it after every change](docs/img/slide-measure.jpg)
 
 20 questions over the three videos with known answer windows: 9 **said**, 4 **shown**, 3 **both**, 4 **not in the videos** (must refuse). A hit is a returned moment within 15 s of the window. No LLM call, so the whole key runs in seconds.
 
@@ -93,6 +107,8 @@ In production each ingestion step is a Prefect task with its own retry rule (fet
 | transcript only | **94%** | 100% | 75% | 100% | 0.91 | 75% |
 | pictures only | 50% | 67% | 0% | 67% | 0.30 | 100% |
 | both (default) | 88% | 100% | 50% | 100% | 0.88 | 75% |
+
+![Three numbers, and none of them needs the model](docs/img/slide-three-numbers.jpg)
 
 Read this honestly: on these three videos the transcript alone wins, because the speaker describes what is on screen, and with short videos nearly every moment is found by both a frame and the text, so the ×1.5 boost stops separating them. Benchmarks on chart-heavy video (CFVBench, above) show the opposite. Run the key on your own videos before you pick.
 
@@ -150,7 +166,7 @@ Colab needs nothing installed, so use it in class. To run on a laptop:
 3. Put `OPENAI_API_KEY=sk-...` in a file named `.env` here (git ignores it).
 4. `python app.py`, or open `quickstart.ipynb` in VS Code or Jupyter.
 
-On a CPU, asking takes about 3 seconds and adding a 4-minute video about 30 to 40 seconds.
+On a CPU, asking takes a few seconds and adding a 4-minute video about 30 to 40 seconds.
 
 ## What's in the repo
 
