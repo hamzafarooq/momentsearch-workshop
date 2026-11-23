@@ -26,28 +26,21 @@ Ask a question about a video and get back the exact moments that answer it: what
 
 Two paths that never share a request. Adding a video is slow and happens once. Asking is fast and happens every time.
 
+**1 · Add a video** (once; ~30 s for a 4-minute video on a CPU)
+
 ```mermaid
-flowchart TB
-  subgraph ingest["1 · Add a video: once, ~30 s for 4 min on a CPU"]
-    direction LR
-    V[video file] --> F["ffmpeg<br/>1 frame / 2 s"] --> D["drop repeats<br/>dHash"] --> C["CLIP ViT-L/14<br/>768-d"]
-    V --> T["transcript<br/>or Whisper"] --> K["20 s chunks"] --> E["OpenAI 1536-d<br/>+ BM25"]
-  end
-  subgraph store["Qdrant"]
-    direction LR
-    QI[("frames")]
-    QT[("transcript")]
-  end
-  subgraph ask["2 · Ask: every question, ~3 s"]
-    direction LR
-    Q[question] --> S["3 searches<br/>in parallel"] --> R["RRF merge<br/>15 s moments"] --> X["rerank<br/>top 30"] --> G{"check 1"}
-    G -- weak --> N["couldn't find it<br/>no LLM call"]
-    G -- ok --> L["LLM reads<br/>6 moments"] --> Z["check 3<br/>citations"] --> A[answer +<br/>moments]
-  end
-  C --> QI
-  E --> QT
-  QI --> S
-  QT --> S
+flowchart LR
+  V[video file] --> F["ffmpeg<br/>1 frame / 2 s"] --> D["drop repeats<br/>dHash"] --> C["CLIP ViT-L/14<br/>768-d"] --> QI[("Qdrant<br/>frames")]
+  V --> T["transcript<br/>or Whisper"] --> K["20 s chunks"] --> E["OpenAI 1536-d<br/>+ BM25"] --> QT[("Qdrant<br/>transcript")]
+```
+
+**2 · Ask** (every question; ~3 s)
+
+```mermaid
+flowchart LR
+  Q[question] --> S["3 searches<br/>frames · meaning · words"] --> R["merge by rank<br/>15 s moments, rerank"] --> G{check 1}
+  G -- weak --> N["“couldn't find it”<br/>no LLM call"]
+  G -- ok --> L["LLM reads<br/>6 moments"] --> A["answer<br/>fake citations removed"]
 ```
 
 ### Adding a video
