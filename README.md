@@ -94,6 +94,8 @@ In production each ingestion step is a Prefect task with its own retry rule (fet
 
 ![Retry the step, not the video](docs/img/slide-retries.jpg)
 
+![Prefect: one retry rule per step](docs/img/slide-prefect.jpg)
+
 Memory is the bill at scale. Each collection keeps full float32 vectors on disk and an int8 copy in RAM that does the searching, then rescores the top hits with the full vectors:
 
 ![A quarter of the memory, the same top ten](docs/img/slide-int8.jpg)
