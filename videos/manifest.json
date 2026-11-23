@@ -1,0 +1,124 @@
+[
+ {
+  "id": "demo_how-llms-work",
+  "title": "How LLMs work",
+  "video": "how-llms-work.mp4",
+  "transcript": "how-llms-work.transcript.json",
+  "duration": 259.2,
+  "chapters": [
+   {
+    "t": 0,
+    "title": "Underneath the chat"
+   },
+   {
+    "t": 39,
+    "title": "Tokens"
+   },
+   {
+    "t": 62,
+    "title": "The context window"
+   },
+   {
+    "t": 101,
+    "title": "No memory between calls"
+   },
+   {
+    "t": 128,
+    "title": "Temperature"
+   },
+   {
+    "t": 166,
+    "title": "The bill, open and closed"
+   },
+   {
+    "t": 213,
+    "title": "One API call"
+   },
+   {
+    "t": 240,
+    "title": "Try it"
+   }
+  ],
+  "poster": "how-llms-work.jpg"
+ },
+ {
+  "id": "demo_llm-to-agent",
+  "title": "What turns an LLM into an agent",
+  "video": "llm-to-agent.mp4",
+  "transcript": "llm-to-agent.transcript.json",
+  "duration": 259.1,
+  "chapters": [
+   {
+    "t": 0,
+    "title": "Then and now"
+   },
+   {
+    "t": 31,
+    "title": "The model on its own"
+   },
+   {
+    "t": 58,
+    "title": "Context"
+   },
+   {
+    "t": 105,
+    "title": "Tools"
+   },
+   {
+    "t": 152,
+    "title": "The agent loop"
+   },
+   {
+    "t": 193,
+    "title": "The harness"
+   },
+   {
+    "t": 227,
+    "title": "Try it"
+   }
+  ],
+  "poster": "llm-to-agent.jpg"
+ },
+ {
+  "id": "demo_harness",
+  "title": "The harness and Claude Code",
+  "video": "harness.mp4",
+  "transcript": "harness.transcript.json",
+  "duration": 252.5,
+  "chapters": [
+   {
+    "t": 0,
+    "title": "Not a chatbot"
+   },
+   {
+    "t": 20,
+    "title": "The kitchen"
+   },
+   {
+    "t": 52,
+    "title": "Tools"
+   },
+   {
+    "t": 80,
+    "title": "Context and memory"
+   },
+   {
+    "t": 119,
+    "title": "Permissions"
+   },
+   {
+    "t": 149,
+    "title": "Directing, not typing"
+   },
+   {
+    "t": 189,
+    "title": "The whole harness"
+   },
+   {
+    "t": 225,
+    "title": "Try it"
+   }
+  ],
+  "poster": "harness.jpg"
+ }
+]
